@@ -1,62 +1,127 @@
-import db, { Options, ValueData } from 'quick.db';
+import mysql from 'mysql2';
+
+import set from './methods/set';
+import has from './methods/has';
+import get from './methods/get';
+import del from './methods/delete';
+
+export interface Options {
+    target?: string | null;
+    table?: string;
+}
+
+export type ValueData = string | number | object | null | boolean | bigint | symbol | any[];
 
 class DB {
 
+    // Declare Methods
+    methods = {
+        get,
+        set,
+        del,
+        has
+    };
+
     keyPrefix = '';
 
-    super: db.table;
+    conn: mysql.Connection;
+    private tableName: string;
 
     constructor(tableName: string, keyPrefix?: string) {
-        this.super = new db.table(tableName);
+        this.conn = mysql.createConnection({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_DATABASE
+        });
+
+        this.tableName = tableName;
 
         if (typeof keyPrefix !== 'undefined')
             this.keyPrefix = keyPrefix + '.';
 
     }
 
-    set(key: string, value: ValueData, ops?: Options): any {
+    async set(key: string, value: ValueData, ops?: Options): Promise<unknown> {
+        if (!key)
+            throw new TypeError('No key specified.');
+
+        if (value === undefined)
+            throw new TypeError('No value specified.');
+
         key = this.keyPrefix + key;
-        return this.super.set(key, value, ops);
+
+        return await this.arbitrate('set', {
+            stringify: true,
+            id: key,
+            data: value,
+            ops: ops || {},
+        });
     }
 
-    get(key: string, ops?: Options): any {
+    async get(key: string, ops?: Options): Promise<any> {
+        if (!key)
+            throw new TypeError('No key specified.');
+
         key = this.keyPrefix + key;
-        return this.super.get(key, ops);
+
+        return await this.arbitrate('get', { id: key, ops: ops || {} });
     }
 
-    fetch(key: string, ops?: Options): any {
+    async has(key: string, ops?: Options): Promise<boolean> {
+        if (!key)
+            throw new TypeError('No key specified.');
+
         key = this.keyPrefix + key;
-        return this.super.fetch(key, ops);
+
+        return await this.arbitrate('has', { id: key, ops: ops || {} });
     }
 
-    add(key: string, value: number, ops?: Options): any {
+    async delete(key: string, ops?: Options): Promise<boolean> {
+        if (!key)
+            throw new TypeError('No key specified.');
+
         key = this.keyPrefix + key;
-        return this.super.add(key, value, ops);
+
+        return await this.arbitrate('del', { id: key, ops: ops || {} });
     }
 
-    subtract(key: string, value: number, ops?: Options): any {
-        key = this.keyPrefix + key;
-        return this.super.subtract(key, value, ops);
-    }
 
-    push(key: string, value: ValueData, ops?: Options): any[] {
-        key = this.keyPrefix + key;
-        return this.super.push(key, value, ops);
-    }
+    async arbitrate(method: string, params: { stringify?: any; id: any; data?: any; ops: any; }) {
+        // Configure Options
+        const options = {
+            table: this.tableName || params.ops.table || 'json',
+        };
 
-    has(key: string, ops?: Options): boolean {
-        key = this.keyPrefix + key;
-        return this.super.has(key, ops);
-    }
+        // Access Database
+        await this.conn.execute(`CREATE TABLE IF NOT EXISTS ${options.table} (ID TEXT, json TEXT)`);
 
-    includes(key: string, ops?: Options): boolean {
-        key = this.keyPrefix + key;
-        return this.super.includes(key, ops);
-    }
+        // Verify Options
+        if (params.ops.target && params.ops.target[0] === '.')
+            params.ops.target = params.ops.target.slice(1); // Remove prefix if necessary
+        if (params.data && params.data === Infinity) 
+            throw new TypeError(`You cannot set Infinity into the database @ ID: ${params.id}`);
+        
 
-    delete(key: string, ops?: Options): boolean {
-        key = this.keyPrefix + key;
-        return this.super.delete(key, ops);
+        // Stringify
+        if (params.stringify) {
+            try {
+                params.data = JSON.stringify(params.data);
+            } catch (e) {
+                throw new TypeError(`Please supply a valid input @ ID: ${params.id}\nError: ${e.message}`);
+            }
+        }
+
+        // Translate dot notation from keys
+        if (params.id && params.id.includes('.')) {
+            const unparsed = params.id.split('.');
+            params.id = unparsed.shift();
+            params.ops.target = unparsed.join('.');
+        }
+
+        // Run & Return Method
+        return (this.methods)[method](this.conn.promise(), params, options);
+
     }
 
     static guildDB(guildID: string): DB {

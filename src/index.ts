@@ -5,9 +5,6 @@ import fs from 'fs';
 import * as path from 'path';
 import { GatewayServer, SlashCreator } from 'slash-create';
 import PolymartAPI from './utils/polymartAPI';
-import { ConfigCommand } from './commands/ConfigCommand';
-import { VerifyCommand } from './commands/VerifyCommand';
-import { ResourceCommand } from './commands/ResourceCommand';
 
 dotenv.config({
     path: '../.env'
@@ -26,13 +23,8 @@ const creator = new SlashCreator({
 
 // @ts-expect-error INTERACTION_CREATE is not yet an event for this version of discord.js
 creator.withServer(new GatewayServer((handler) => client.ws.on('INTERACTION_CREATE', handler)))
-// .registerCommandsIn(path.join(__dirname, 'commands'))
-    .registerCommand(ResourceCommand)
-    .registerCommand(VerifyCommand)
-    .registerCommand(ConfigCommand)
-    .syncCommands({
-        skipGuildErrors: false
-    });
+    .registerCommandsIn(path.join(__dirname, 'commands'))
+    .syncGlobalCommands();
 
 creator.on('synced', () => {
     consola.success('Finished syncing commands!');
@@ -60,6 +52,10 @@ fs.readdir(path.join(__dirname, 'events'), (err, files) => {
 let verifyURL;
 client.login(process.env.BOT_TOKEN).then(async () => {
     verifyURL = await PolymartAPI.generateUserVerifyURL();
+
+    // If the bot is in the polymart server, sync the polymart server commands
+    if (client.guilds.cache.get('708395251823542312'))
+        creator.syncCommandsIn('708395251823542312');
 });
 
 export { client, verifyURL };

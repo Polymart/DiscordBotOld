@@ -1,6 +1,7 @@
 import { CommandContext, SlashCommand, SlashCreator } from 'slash-create';
 import { MessageOptions } from 'slash-create/lib/context';
 import { MessageEmbed } from 'discord.js';
+import { client } from '../index';
 
 export class InviteCommand extends SlashCommand {
     constructor(creator: SlashCreator) {
@@ -12,7 +13,7 @@ export class InviteCommand extends SlashCommand {
     }
 
     async run(ctx: CommandContext): Promise<MessageOptions> {
-        const link = 'https://discord.com/api/oauth2/authorize?client_id=807352229446025267&permissions=268527680&scope=bot%20applications.commands';
+        const link = `https://discord.com/api/oauth2/authorize?client_id=${client.user.id}&permissions=268527680&scope=bot%20applications.commands`;
         return { embeds: [new MessageEmbed().setDescription(`Click [here](${link}) to invite me to your server!`).toJSON()] };
     }
 }

@@ -1,9 +1,10 @@
 import { CommandContext, CommandOptionType, SlashCommand, SlashCreator } from 'slash-create';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, Util } from 'discord.js';
 import { getChannel } from '../utils/helper';
 import PolymartAPI from '../utils/polymartAPI';
 import { MessageOptions } from 'slash-create/lib/context';
 import { hexToDec } from 'hex2dec';
+import * as util from 'util';
 
 export class FancySearchCommand extends SlashCommand {
     constructor(creator: SlashCreator) {
@@ -49,7 +50,7 @@ export class FancySearchCommand extends SlashCommand {
                     reaction.emoji.name === '⬅️' ? currentIndex -= 1 : currentIndex += 1;
                     // edit message with new embed
                     data = await this.fetchData(search, currentIndex);
-                    message.edit(this.generateEmbed(data.result[0]));
+                    await message.edit(this.generateEmbed(data.result[0]));
                     // react with left arrow if it isn't the start (await is used so that the right arrow always goes after the left)
                     if (currentIndex !== 0) await message.react('⬅️');
                     // react with right arrow if it isn't the end
@@ -78,7 +79,7 @@ export class FancySearchCommand extends SlashCommand {
 
     generateEmbed(resource: ResultElement): MessageEmbed {
         return new MessageEmbed({
-            color: hexToDec(resource.themeColorDark),
+            color: Util.resolveColor(resource.themeColorDark),
             author: {
                 name: resource.title,
                 url: resource.url,

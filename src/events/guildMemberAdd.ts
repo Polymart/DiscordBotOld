@@ -13,14 +13,14 @@ module.exports = async (...args: ClientEvents['guildMemberAdd']) => {
 
     // Grab our api key
     let apiKey;
-    if (!guildDB.has('apiKey')) return;
+    if (!await guildDB.has('apiKey')) return;
     else apiKey = guildDB.get('apiKey');
 
-    if (!userDB.has('userID')) {
-        const userID = userDB.get('userID');
+    if (!await userDB.has('userID')) {
+        const userID = await userDB.get('userID');
         let validResources = 0;
 
-        if (guildDB.has('resources') && guildDB.get('resources') !== null) {
+        if (await guildDB.has('resources') && await guildDB.get('resources') !== null) {
             const resources = guildDB.get('resources');
 
             for (const rID in resources) {
@@ -43,8 +43,8 @@ module.exports = async (...args: ClientEvents['guildMemberAdd']) => {
 
         }
 
-        if (guildDB.has('verifiedRole') && validResources > 0)
-            await member.roles.add(guildDB.get('verifiedRole'));
+        if (await guildDB.has('verifiedRole') && validResources > 0)
+            await member.roles.add(await guildDB.get('verifiedRole'));
     }
 
 };

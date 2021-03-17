@@ -1,4 +1,4 @@
-import { APIMessageContentResolvable, GuildMember, Message, MessageAdditions, MessageOptions, TextChannel } from 'discord.js';
+ import { APIMessageContentResolvable, GuildMember, Message, MessageAdditions, MessageOptions, TextChannel } from 'discord.js';
 import { client } from '../index';
 import { CommandContext } from 'slash-create';
 

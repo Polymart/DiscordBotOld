@@ -6,7 +6,7 @@ export class AdminCommand extends SlashCommand {
     constructor(creator: SlashCreator) {
         super(creator, {
             name: 'admin',
-            guildID: '708395251823542312', // polymart server
+            guildIDs: '708395251823542312', // polymart server
             description: 'Polymart Bot admin commands!',
             requiredPermissions: ['ADMINISTRATOR'],
             options: [
@@ -38,9 +38,9 @@ export class AdminCommand extends SlashCommand {
 
         switch (key) {
             case 'unlink':
-                if (!verificationDB.has(options['userid'])) return { content: 'User not verified!', ephemeral: true };
+                if (!await verificationDB.has(options['userid'])) return { content: 'User not verified!', ephemeral: true };
                 // TODO remove verified roles from discord user that was connected to the userid
-                verificationDB.delete(options['userid']);
+                await verificationDB.delete(options['userid']);
                 return { content: 'Unlinked user!', ephemeral: true };
             default:
                 return { content: 'Not implemented yet!', ephemeral: true };

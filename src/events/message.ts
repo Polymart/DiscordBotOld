@@ -9,5 +9,5 @@ module.exports = async (...args: ClientEvents['message']) => {
 
     const guildDB = new DB('guilds', message.guild.id);
 
-    if (guildDB.has('verificationChannel') && guildDB.get('verificationChannel') === message.channel.id) await message.delete();
+    if (await guildDB.has('verificationChannel') && await guildDB.get('verificationChannel') === message.channel.id) await message.delete();
 };

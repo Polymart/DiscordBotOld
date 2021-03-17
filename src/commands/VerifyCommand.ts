@@ -30,11 +30,11 @@ export class VerifyCommand extends SlashCommand {
 
         // Grab our api key
         let apiKey;
-        if (!guildDB.has('apiKey')) return { content: 'Bot has not been configured correctly. Missing API KEY', ephemeral: true };
+        if (!await guildDB.has('apiKey')) return { content: 'Bot has not been configured correctly. Missing API KEY', ephemeral: true };
         else apiKey = guildDB.get('apiKey');
         
         // Check user token with verifyUser api route
-        if (!userDB.has('userID')) {
+        if (!await userDB.has('userID')) {
             if (typeof ctx.options.token === 'undefined') return { content: `Get your token [here](${verifyURL})`, ephemeral: true };
 
             userID = await PolymartAPI.verifyUser(<string>ctx.options.token);
@@ -43,12 +43,12 @@ export class VerifyCommand extends SlashCommand {
             // Check userID hasn't been used before!!
 
             const verificationDB = new DB('verify');
-            if (verificationDB.has(userID)) return { content: 'Verification Failed - Account already linked', ephemeral: true };
+            if (await verificationDB.has(userID)) return { content: 'Verification Failed - Account already linked', ephemeral: true };
 
-            verificationDB.set(userID, ctx.member.id);
+            await verificationDB.set(userID, ctx.member.id);
 
             // Successfully found Polymart Account
-            userDB.set('userID', userID);
+            await userDB.set('userID', userID);
 
         } else userID = userDB.get('userID');
 
@@ -59,12 +59,14 @@ export class VerifyCommand extends SlashCommand {
                 
         let validResources = 0;
 
-        if (guildDB.has('resources') && guildDB.get('resources') !== null) {
+        if (await guildDB.has('resources') && await guildDB.get('resources') !== null) {
             const resources = guildDB.get('resources');
 
 
             for (const rID in resources) {
                 const resourceUserData = await PolymartAPI.getResourceUserData(rID, userID, apiKey);
+
+                consola.log(resourceUserData);
 
                 if (resourceUserData === null) return { content: 'An error occured fetching user data!', ephemeral: true };
                 if (resourceUserData.purchaseValid) {
@@ -87,8 +89,8 @@ export class VerifyCommand extends SlashCommand {
 
         }
 
-        if (guildDB.has('verifiedRole') && validResources > 0)
-            await member.roles.add(guildDB.get('verifiedRole'));
+        if (await guildDB.has('verifiedRole') && validResources > 0)
+            await member.roles.add(await guildDB.get('verifiedRole'));
 
         if (validResources > 0) return { content: 'You have been verified!', ephemeral: true };
 

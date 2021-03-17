@@ -3,6 +3,7 @@ import { MessageOptions } from 'slash-create/lib/context';
 import PolymartAPI from '../utils/polymartAPI';
 import DB from '../utils/database';
 import { hexToDec } from 'hex2dec';
+import { Util } from 'discord.js';
 
 export class ResourceCommand extends SlashCommand {
     constructor(creator: SlashCreator) {
@@ -55,7 +56,7 @@ export class ResourceCommand extends SlashCommand {
 
         // Grab our api key
         let apiKey;
-        if (!guildDB.has('apiKey')) return { content: 'Bot has not been configured correctly. Missing API KEY', ephemeral: true };
+        if (!await guildDB.has('apiKey')) return { content: 'Bot has not been configured correctly. Missing API KEY', ephemeral: true };
         else apiKey = guildDB.get('apiKey');
 
         if (typeof ctx.options[key]['resourceid'] !== 'undefined') {
@@ -69,7 +70,7 @@ export class ResourceCommand extends SlashCommand {
                 return {
                     embeds: [
                         {
-                            color: hexToDec(response.themeColorDark),
+                            color: Util.resolveColor(response.themeColorDark),
                             author: {
                                 name: response.title,
                                 url: `https://polymart.org/resource/${response.id}`,
@@ -95,7 +96,7 @@ export class ResourceCommand extends SlashCommand {
                 };
             case 'add':
                 if ('role' in <any>ctx.options[key]) response['role'] = ctx.options[key]['role'];
-                guildDB.set(`resources.r_${response.id}`, response);
+                await guildDB.set(`resources.r_${response.id}`, response);
 
                 return { content: response.title + ' added to the guild\'s resource list!', ephemeral: true };
             default:

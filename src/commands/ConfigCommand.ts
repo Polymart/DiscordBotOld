@@ -66,16 +66,16 @@ export class ConfigCommand extends SlashCommand {
                 switch (subKey) {
                     case 'verification':
                         if ('channel' in options) {
-                            guildDB.set('verificationChannel', options.channel);
+                            await guildDB.set('verificationChannel', options.channel);
                             await sendMessage(ctx, ConfigCommand.verificationInstructions(), options.channel);
                         }
 
                         if ('role' in options)
-                            guildDB.set('verifiedRole', options.role);
+                            await guildDB.set('verifiedRole', options.role);
 
                         return { content: 'Successfully updated verification config!', ephemeral: true };
                     case 'apikey':
-                        guildDB.set('apiKey', options.key);
+                        await guildDB.set('apiKey', options.key);
 
                         return { content: 'Successfully set API KEY!', ephemeral: true };
                     default:
