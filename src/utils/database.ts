@@ -4,6 +4,7 @@ import set from './methods/set';
 import has from './methods/has';
 import get from './methods/get';
 import del from './methods/delete';
+import consola from 'consola';
 
 export interface Options {
     target?: string | null;
@@ -130,6 +131,13 @@ class DB {
 
     static userDB(userID: string): DB {
         return new DB('users', userID);
+    }
+
+    static connect() {
+        const db = new DB('');
+        db.conn.connect(err => {
+            if (err) consola.error(err);
+        });
     }
 }
 

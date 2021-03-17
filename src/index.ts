@@ -5,6 +5,7 @@ import fs from 'fs';
 import * as path from 'path';
 import { GatewayServer, SlashCreator } from 'slash-create';
 import PolymartAPI from './utils/polymartAPI';
+import DB from './utils/database';
 
 dotenv.config({
     path: '../.env'
@@ -52,6 +53,9 @@ fs.readdir(path.join(__dirname, 'events'), (err, files) => {
 let verifyURL;
 client.login(process.env.BOT_TOKEN).then(async () => {
     verifyURL = await PolymartAPI.generateUserVerifyURL();
+
+    // Test DB connection
+    DB.connect();
 
     // If the bot is in the polymart server, sync the polymart server commands
     if (client.guilds.cache.get('708395251823542312'))
