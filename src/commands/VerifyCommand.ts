@@ -5,6 +5,7 @@ import { getMember } from '../utils/helper';
 import DB from '../utils/database';
 import { verifyURL } from '../index';
 import consola from 'consola';
+import groupBy from 'lodash/groupBy';
 
 export class VerifyCommand extends SlashCommand {
     constructor(creator: SlashCreator) {
@@ -32,7 +33,7 @@ export class VerifyCommand extends SlashCommand {
         let apiKey;
         if (!await guildDB.has('apiKey')) return { content: 'Bot has not been configured correctly. Missing API KEY', ephemeral: true };
         else apiKey = await guildDB.get('apiKey');
-        
+
         // Check user token with verifyUser api route
         if (!await userDB.has('userID')) {
             if (typeof ctx.options.token === 'undefined') return { content: `Get your token [here](${verifyURL})`, ephemeral: true };
@@ -56,21 +57,21 @@ export class VerifyCommand extends SlashCommand {
         const member = await getMember(ctx);
 
         // Check user against the current guilds resources
-                
+
         let validResources = 0;
 
         if (await guildDB.has('resources')) {
             const resources = await guildDB.get('resources');
 
+            const userData = await PolymartAPI.getUserData(userID, apiKey);
+            if (userData === null) return { content: 'An error occured fetching user data!', ephemeral: true };
+
+            const userResourceData = groupBy(userData.resources, 'id');
 
             for (const rID in resources) {
                 const resourceInfo = resources[rID];
-                const resourceUserData = await PolymartAPI.getResourceUserData(resourceInfo.id, userID, apiKey);
 
-                consola.log(resourceUserData);
-
-                if (resourceUserData === null) return { content: 'An error occured fetching user data!', ephemeral: true };
-                if (resourceUserData.purchaseValid) {
+                if (userResourceData[resourceInfo.id][0]['purchaseValid']) {
                     validResources++;
 
                     if ('role' in resourceInfo) {
