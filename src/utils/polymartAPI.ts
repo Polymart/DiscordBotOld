@@ -89,8 +89,7 @@ export default class PolymartAPI {
                 sort: params.sort,
                 premium: params.premium,
                 start: params.start,
-                limit: params.limit,
-                referrer: 1181
+                limit: params.limit
             }
         });
 
