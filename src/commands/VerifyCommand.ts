@@ -31,7 +31,7 @@ export class VerifyCommand extends SlashCommand {
         // Grab our api key
         let apiKey;
         if (!await guildDB.has('apiKey')) return { content: 'Bot has not been configured correctly. Missing API KEY', ephemeral: true };
-        else apiKey = guildDB.get('apiKey');
+        else apiKey = await guildDB.get('apiKey');
         
         // Check user token with verifyUser api route
         if (!await userDB.has('userID')) {
@@ -50,7 +50,7 @@ export class VerifyCommand extends SlashCommand {
             // Successfully found Polymart Account
             await userDB.set('userID', userID);
 
-        } else userID = userDB.get('userID');
+        } else userID = await userDB.get('userID');
 
         // Generic verified role
         const member = await getMember(ctx);
@@ -59,12 +59,13 @@ export class VerifyCommand extends SlashCommand {
                 
         let validResources = 0;
 
-        if (await guildDB.has('resources') && await guildDB.get('resources') !== null) {
-            const resources = guildDB.get('resources');
+        if (await guildDB.has('resources')) {
+            const resources = await guildDB.get('resources');
 
 
             for (const rID in resources) {
-                const resourceUserData = await PolymartAPI.getResourceUserData(rID, userID, apiKey);
+                const resourceInfo = resources[rID];
+                const resourceUserData = await PolymartAPI.getResourceUserData(resourceInfo.id, userID, apiKey);
 
                 consola.log(resourceUserData);
 
@@ -72,9 +73,9 @@ export class VerifyCommand extends SlashCommand {
                 if (resourceUserData.purchaseValid) {
                     validResources++;
 
-                    if ('role' in resources[rID]) {
+                    if ('role' in resourceInfo) {
                         try {
-                            await member.roles.add(resources[rID]['role']);
+                            await member.roles.add(resourceInfo['role']);
                         } catch (e) {
                             consola.error(e);
                             if (e.message === 'Missing Permissions')

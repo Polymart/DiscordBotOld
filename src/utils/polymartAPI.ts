@@ -39,7 +39,7 @@ export default class PolymartAPI {
         return null;
     }
 
-    public static async getResourceUserData(resource_id: string, user_id: number, api_key: string): Promise<ResourceUserData> {
+    public static async getResourceUserData(resource_id: string | number, user_id: number, api_key: string): Promise<ResourceUserData> {
         const response = await axios.post<getResourceUserData>(this.BASE_URL + '/v1/getResourceUserData', {
             api_key,
             resource_id,
@@ -106,7 +106,6 @@ export default class PolymartAPI {
         if (typeof response.data.response.errors.global !== 'undefined')
             consola.error(response.data.response.errors.global);
 
-        consola.debug(response.request);
         consola.debug(response.data);
     }
 }

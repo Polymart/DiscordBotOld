@@ -14,14 +14,14 @@ module.exports = async (...args: ClientEvents['guildMemberAdd']) => {
     // Grab our api key
     let apiKey;
     if (!await guildDB.has('apiKey')) return;
-    else apiKey = guildDB.get('apiKey');
+    else apiKey = await guildDB.get('apiKey');
 
     if (!await userDB.has('userID')) {
         const userID = await userDB.get('userID');
         let validResources = 0;
 
         if (await guildDB.has('resources') && await guildDB.get('resources') !== null) {
-            const resources = guildDB.get('resources');
+            const resources = await guildDB.get('resources');
 
             for (const rID in resources) {
                 const resourceUserData = await PolymartAPI.getResourceUserData(rID, userID, apiKey);

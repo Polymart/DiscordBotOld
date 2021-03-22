@@ -57,7 +57,7 @@ export class ResourceCommand extends SlashCommand {
         // Grab our api key
         let apiKey;
         if (!await guildDB.has('apiKey')) return { content: 'Bot has not been configured correctly. Missing API KEY', ephemeral: true };
-        else apiKey = guildDB.get('apiKey');
+        else apiKey = await guildDB.get('apiKey');
 
         if (typeof ctx.options[key]['resourceid'] !== 'undefined') {
             response = await PolymartAPI.getResourceInfo(ctx.options[key]['resourceid'], apiKey);
