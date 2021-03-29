@@ -25,17 +25,10 @@ class DB {
 
     keyPrefix = '';
 
-    conn: mysql.Connection;
+    private static conn: mysql.Connection;
     private tableName: string;
 
     constructor(tableName: string, keyPrefix?: string) {
-        this.conn = mysql.createConnection({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_DATABASE
-        });
-
         this.tableName = tableName;
 
         if (typeof keyPrefix !== 'undefined')
@@ -95,7 +88,7 @@ class DB {
         };
 
         // Access Database
-        await this.conn.execute(`CREATE TABLE IF NOT EXISTS ${options.table} (ID TEXT, json TEXT)`);
+        await DB.getConnection().execute(`CREATE TABLE IF NOT EXISTS ${options.table} (ID TEXT, json TEXT)`);
 
         // Verify Options
         if (params.ops.target && params.ops.target[0] === '.')
@@ -121,7 +114,7 @@ class DB {
         }
 
         // Run & Return Method
-        return (this.methods)[method](this.conn.promise(), params, options);
+        return (this.methods)[method](DB.getConnection().promise(), params, options);
 
     }
 
@@ -133,9 +126,21 @@ class DB {
         return new DB('users', userID);
     }
 
-    static connect() {
-        const db = new DB('');
-        db.conn.connect(err => {
+    public static getConnection(): mysql.Connection {
+        if (!DB.conn) {
+            DB.conn = mysql.createConnection({
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_DATABASE
+            });
+        }
+
+        return DB.conn;
+    }
+
+    static connect(): void {
+        DB.getConnection().connect(err => {
             if (err) consola.error(err);
         });
     }
