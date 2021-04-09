@@ -90,6 +90,7 @@ export default class PolymartAPI {
                 premium: params.premium,
                 start: params.start,
                 limit: params.limit,
+                referrer: params.referrer
             },
         })
 
@@ -102,7 +103,7 @@ export default class PolymartAPI {
     }
 
     private static checkErrors(response: AxiosResponse) {
-        if (typeof response.data.response.errors.global !== 'undefined')
+        if (response.data.response.errors && response.data.response.errors.global)
             consola.error(response.data.response.errors.global)
 
         consola.debug(response.data)
