@@ -17,6 +17,7 @@ export class Resource extends BaseEntity {
 
     @ManyToOne(() => Config, config => config.resources, {
         createForeignKeyConstraints: false,
+        primary: true
     })
     guild: Config
 
