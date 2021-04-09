@@ -1,11 +1,10 @@
- import { APIMessageContentResolvable, GuildMember, Message, MessageAdditions, MessageOptions, TextChannel } from 'discord.js';
-import { client } from '../index';
-import { CommandContext } from 'slash-create';
+import { APIMessageContentResolvable, GuildMember, Message, MessageAdditions, MessageOptions, TextChannel } from 'discord.js'
+import { client } from '../index'
+import { CommandContext } from 'slash-create'
 
 /*
  * Collection of helper function to get discord methods from slash-create's Command Context
  */
-
 
 /**
  * Get current channel
@@ -14,7 +13,7 @@ import { CommandContext } from 'slash-create';
  * @returns {Promise<TextChannel>}
  */
 export async function getChannel(ctx: CommandContext): Promise<TextChannel> {
-    return <TextChannel>(await client.guilds.fetch(ctx.guildID)).channels.cache.get(ctx.channelID);
+    return <TextChannel>(await client.guilds.fetch(ctx.guildID)).channels.cache.get(ctx.channelID)
 }
 
 /**
@@ -24,7 +23,7 @@ export async function getChannel(ctx: CommandContext): Promise<TextChannel> {
  * @returns {Promise<GuildMember>}
  */
 export async function getMember(ctx: CommandContext): Promise<GuildMember> {
-    return <GuildMember>(await client.guilds.fetch(ctx.guildID)).members.cache.get(ctx.member.id);
+    return <GuildMember>(await client.guilds.fetch(ctx.guildID)).members.cache.get(ctx.member.id)
 }
 
 /**
@@ -36,5 +35,5 @@ export async function getMember(ctx: CommandContext): Promise<GuildMember> {
  * @returns {Promise<GuildMember>}
  */
 export async function sendMessage(ctx: CommandContext, content: APIMessageContentResolvable | (MessageOptions & { split?: false }) | MessageAdditions, channelID = ctx.channelID): Promise<Message> {
-    return (<TextChannel>(await client.guilds.fetch(ctx.guildID)).channels.cache.get(channelID)).send(content);
+    return (<TextChannel>(await client.guilds.fetch(ctx.guildID)).channels.cache.get(channelID)).send(content)
 }

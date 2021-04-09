@@ -1,11 +1,9 @@
-import { CommandContext, CommandOptionType, SlashCommand, SlashCreator } from 'slash-create';
-import { MessageEmbed, Util } from 'discord.js';
-import { getChannel } from '../utils/helper';
-import PolymartAPI from '../utils/polymartAPI';
-import { MessageOptions } from 'slash-create/lib/context';
-import { hexToDec } from 'hex2dec';
-import * as util from 'util';
-import PolyBaseCommand from '../classes/PolyCommand';
+import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create'
+import { MessageEmbed, Util } from 'discord.js'
+import { getChannel } from '../utils/helper'
+import PolymartAPI from '../classes/PolymartAPI'
+import { MessageOptions } from 'slash-create/lib/context'
+import PolyBaseCommand from '../classes/PolyCommand'
 
 export class FancySearchCommand extends PolyBaseCommand {
     constructor(creator: SlashCreator) {
@@ -17,56 +15,56 @@ export class FancySearchCommand extends PolyBaseCommand {
                     name: 'query',
                     description: 'Search query',
                     type: CommandOptionType.STRING,
-                    required: true
-                }
-            ]
-        });
-        this.filePath = __filename;
+                    required: true,
+                },
+            ],
+        })
+        this.filePath = __filename
     }
 
     async run(ctx: CommandContext): Promise<MessageOptions> {
 
-        const channel = await getChannel(ctx);
+        const channel = await getChannel(ctx)
 
-        const search = <string>ctx.options.query;
+        const search = <string>ctx.options.query
 
-        let data = (await this.fetchData(search, 0));
+        let data = (await this.fetchData(search, 0))
 
         channel.send(this.generateEmbed(data.result[0])).then((message) => {
-            message.react('➡️');
+            message.react('➡️')
             const collector = message.createReactionCollector(
                 // only collect left and right arrow reactions from the message author
                 (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === ctx.member.id,
                 // time out after a minute
                 { time: 60000 }
-            );
+            )
 
-            let currentIndex = 0;
+            let currentIndex = 0
             collector.on('collect', reaction => {
                 // remove the existing reactions
                 message.reactions.removeAll().then(async () => {
                     // reset minute timer when we interact with it
-                    collector.resetTimer({ time: 60000 });
+                    collector.resetTimer({ time: 60000 })
                     // increase/decrease index
-                    reaction.emoji.name === '⬅️' ? currentIndex -= 1 : currentIndex += 1;
+                    reaction.emoji.name === '⬅️' ? currentIndex -= 1 : currentIndex += 1
                     // edit message with new embed
-                    data = await this.fetchData(search, currentIndex);
-                    await message.edit(this.generateEmbed(data.result[0]));
+                    data = await this.fetchData(search, currentIndex)
+                    await message.edit(this.generateEmbed(data.result[0]))
                     // react with left arrow if it isn't the start (await is used so that the right arrow always goes after the left)
-                    if (currentIndex !== 0) await message.react('⬅️');
+                    if (currentIndex !== 0) await message.react('⬅️')
                     // react with right arrow if it isn't the end
-                    if (data.result_count !== 1 || data.more) await message.react('➡️');
-                });
-            });
+                    if (data.result_count !== 1 || data.more) await message.react('➡️')
+                })
+            })
 
             collector.on('end', (e) => {
-                message.delete();
-                ctx.send({ content: 'Search has timed out', ephemeral: true });
-            });
+                message.delete()
+                ctx.send({ content: 'Search has timed out', ephemeral: true })
+            })
 
-        });
+        })
 
-        return;
+        return
 
     }
 
@@ -74,8 +72,8 @@ export class FancySearchCommand extends PolyBaseCommand {
         return await PolymartAPI.search({
             limit: 1,
             query,
-            start
-        });
+            start,
+        })
     }
 
     generateEmbed(resource: ResultElement): MessageEmbed {
@@ -97,14 +95,14 @@ export class FancySearchCommand extends PolyBaseCommand {
                 },
                 {
                     name: 'Price:',
-                    value: `${resource.price} ${resource.currency}`
-                }
+                    value: `${resource.price} ${resource.currency}`,
+                },
             ],
             footer: {
                 text: resource.owner.name,
                 icon_url: `https://s3.amazonaws.com/polymart.${resource.owner.type}.profilepictures/large/${resource.owner.id}`,
-                iconURL: `https://s3.amazonaws.com/polymart.${resource.owner.type}.profilepictures/large/${resource.owner.id}`
-            }
-        });
+                iconURL: `https://s3.amazonaws.com/polymart.${resource.owner.type}.profilepictures/large/${resource.owner.id}`,
+            },
+        })
     }
 }

@@ -24,7 +24,8 @@
     "lodash": "^4.17.21",
     "mysql2": "^2.2.5",
     "path": "^0.12.7",
-    "slash-create": "^2.1.2"
+    "slash-create": "^2.1.2",
+    "typeorm": "^0.2.32"
   },
   "devDependencies": {
     "@types/hex2dec": "^1.1.0",

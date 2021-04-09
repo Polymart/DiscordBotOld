@@ -1,55 +1,45 @@
-import { ClientEvents } from 'discord.js';
-import DB from '../utils/database';
-import PolymartAPI from '../utils/polymartAPI';
-import consola from 'consola';
-import groupBy from 'lodash/groupBy';
+import { ClientEvents } from 'discord.js'
+import PolymartAPI from '../classes/PolymartAPI'
+import consola from 'consola'
+import Database from '../classes/Database'
+import { Config } from '../models/Config'
+import { User } from '../models/User'
 
 module.exports = async (...args: ClientEvents['guildMemberAdd']) => {
-    const [member] = args;
+    const [member] = args
 
     // When user joins check if they have already verified with the Polymart bot and auto verify them!
+    const manager = await Database.getInstance().getManager()
+    const config = await manager.findOne(Config, member.guild.id)
+    if (!config) return
+    const user = await manager.findOne(User, member.user.id)
+    if (!user) return
 
-    const userDB = DB.userDB(member.user.id);
-    const guildDB = DB.userDB(member.guild.id);
-
+    const resources = await config.resources
     // Grab our api key
-    let apiKey;
-    if (!await guildDB.has('apiKey')) return;
-    else apiKey = await guildDB.get('apiKey');
+    if (!config.apiKey) return
 
-    if (!await userDB.has('userID')) {
-        const userID = await userDB.get('userID');
-        let validResources = 0;
+    let validResources = 0
 
-        if (await guildDB.has('resources')) {
-            const resources = await guildDB.get('resources');
+    const userData = await PolymartAPI.getUserData(user.polymartUserId, config.apiKey)
+    if (userData === null) return
 
-            const userData = await PolymartAPI.getUserData(userID, apiKey);
-            if (userData === null) return;
+    for (const resource of userData.resources) {
+        if (resource.purchaseValid) {
+            validResources++
 
-            const userResourceData = groupBy(userData.resources, 'id');
-
-            for (const rID in resources) {
-                const resourceInfo = resources[rID];
-
-                if (userResourceData[resourceInfo.id][0]['purchaseValid']) {
-                    validResources++;
-
-                    if ('role' in resourceInfo) {
-                        try {
-                            await member.roles.add(resourceInfo['role']);
-                        } catch (e) {
-                            consola.error(e);
-                        }
-
-                    }
+            const resourceConfig = resources.find(r => r.Id === resource.id)
+            if (resourceConfig) {
+                try {
+                    await member.roles.add(resourceConfig.discordRole)
+                } catch (e) {
+                    consola.error(e)
                 }
             }
-
         }
-
-        if (await guildDB.has('verifiedRole') && validResources > 0)
-            await member.roles.add(await guildDB.get('verifiedRole'));
     }
 
-};
+    if (config.verifiedRole && validResources > 0)
+        await member.roles.add(config.verifiedRole)
+
+}

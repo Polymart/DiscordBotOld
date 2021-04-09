@@ -1,13 +1,15 @@
-import { ClientEvents } from 'discord.js';
-import { client } from '../index';
-import DB from '../utils/database';
+import { ClientEvents } from 'discord.js'
+import { client } from '../index'
+import Database from '../classes/Database'
+import { Config } from '../models/Config'
 
 module.exports = async (...args: ClientEvents['message']) => {
-    const [message] = args;
+    const [message] = args
 
-    if (message.author.id === client.user.id) return;
+    if (message.author.id === client.user.id) return
 
-    const guildDB = new DB('guilds', message.guild.id);
+    const manager = await Database.getInstance().getManager()
+    const config = await manager.findOne(Config, message.guild.id)
 
-    if (await guildDB.has('verificationChannel') && await guildDB.get('verificationChannel') === message.channel.id) await message.delete();
-};
+    if (config && config.verificationChannel === message.channel.id) await message.delete()
+}

@@ -1,10 +1,11 @@
-import { CommandContext, CommandOptionType, SlashCommand, SlashCreator } from 'slash-create';
-import { MessageOptions } from 'slash-create/lib/context';
-import PolymartAPI from '../utils/polymartAPI';
-import DB from '../utils/database';
-import { hexToDec } from 'hex2dec';
-import { Util } from 'discord.js';
-import PolyBaseCommand from '../classes/PolyCommand';
+import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create'
+import { MessageOptions } from 'slash-create/lib/context'
+import PolymartAPI from '../classes/PolymartAPI'
+import { Util } from 'discord.js'
+import PolyBaseCommand from '../classes/PolyCommand'
+import Database from '../classes/Database'
+import { Config } from '../models/Config'
+import { Resource } from '../models/Resource'
 
 export class ResourceCommand extends PolyBaseCommand {
     constructor(creator: SlashCreator) {
@@ -14,21 +15,22 @@ export class ResourceCommand extends PolyBaseCommand {
             requiredPermissions: ['ADMINISTRATOR'],
             options: [
                 {
-                    name: 'add',
-                    description: 'Add a resource to be checked when a user verifies with Polymart',
+                    name: 'config',
+                    description: 'Set the role for the resource',
                     type: CommandOptionType.SUB_COMMAND,
                     options: [
                         {
                             name: 'resourceid',
                             description: 'Resource ID from Polymart',
                             required: true,
-                            type: CommandOptionType.INTEGER
+                            type: CommandOptionType.INTEGER,
                         },
                         {
                             name: 'role',
                             description: 'Role to assign user if they have this resource when verifying',
-                            type: CommandOptionType.ROLE
-                        }
+                            required: true,
+                            type: CommandOptionType.ROLE,
+                        },
                     ]
                 },
                 {
@@ -40,31 +42,38 @@ export class ResourceCommand extends PolyBaseCommand {
                             name: 'resourceid',
                             description: 'Resource ID from Polymart',
                             type: CommandOptionType.INTEGER,
-                            required: true
-                        }
-                    ]
+                            required: true,
+                        },
+                    ],
                 }
             ]
-        });
-        this.filePath = __filename;
+        })
+        this.filePath = __filename
     }
 
     async run(ctx: CommandContext): Promise<MessageOptions> {
-        const guildDB = DB.guildDB(ctx.guildID);
-        let response: ResourceInfo;
+        const manager = await Database.getInstance().getManager()
+        const config = await manager.findOne(Config, ctx.guildID)
+        if (!config) return { content: 'Bot has not been configured correctly.', ephemeral: true }
+        let response: ResourceInfo
 
-        const key = Object.keys(ctx.options)[0];
+        const key = Object.keys(ctx.options)[0]
 
-        // Grab our api key
-        let apiKey;
-        if (!await guildDB.has('apiKey')) return { content: 'Bot has not been configured correctly. Missing API KEY', ephemeral: true };
-        else apiKey = await guildDB.get('apiKey');
+        if (!config.apiKey) {
+            return {
+                content: 'Bot has not been configured correctly. Missing API KEY',
+                ephemeral: true,
+            }
+        }
 
         if (typeof ctx.options[key]['resourceid'] !== 'undefined') {
-            response = await PolymartAPI.getResourceInfo(ctx.options[key]['resourceid'], apiKey);
+            response = await PolymartAPI.getResourceInfo(ctx.options[key]['resourceid'], config.apiKey)
 
-            if (response === null) return { content: 'Resource not found!', ephemeral: true };
+            if (response === null) return { content: 'Resource not found!', ephemeral: true }
         }
+
+        const resources = await config.resources
+        const resource = resources.find(r => r.Id === response.id)
 
         switch (key) {
             case 'info':
@@ -84,24 +93,29 @@ export class ResourceCommand extends PolyBaseCommand {
                             fields: [
                                 {
                                     name: 'Price',
-                                    value: `${response.price} ${response.currency}`
+                                    value: `${response.price} ${response.currency}`,
                                 }
                             ],
                             footer: {
                                 text: response.owner.name,
                                 icon_url: `https://s3.amazonaws.com/polymart.${response.owner.type}.profilepictures/large/${response.owner.id}`,
-                                iconURL: `https://s3.amazonaws.com/polymart.${response.owner.type}.profilepictures/large/${response.owner.id}`
-                            }
+                                iconURL: `https://s3.amazonaws.com/polymart.${response.owner.type}.profilepictures/large/${response.owner.id}`,
+                            },
                         }
                     ]
-                };
-            case 'add':
-                if ('role' in <any>ctx.options[key]) response['role'] = ctx.options[key]['role'];
-                await guildDB.set(`resources.r_${response.id}`, response);
+                }
+            case 'config':
+                if (resource) resource.discordRole = ctx.options[key]['role']
+                else resources.push(new Resource(response, ctx.options[key]['role']))
 
-                return { content: response.title + ' added to the guild\'s resource list!', ephemeral: true };
+                config.resources = Promise.resolve(resources)
+                await config.save()
+                return {
+                    content: response.title + ' role updated to <@&' + ctx.options[key]['role'] + '>',
+                    ephemeral: true,
+                }
             default:
-                return { content: 'Not implemented yet!', ephemeral: true };
+                return { content: 'Not implemented yet!', ephemeral: true }
 
         }
     }
