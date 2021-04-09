@@ -4,8 +4,9 @@ import PolymartAPI from '../utils/polymartAPI';
 import DB from '../utils/database';
 import { hexToDec } from 'hex2dec';
 import { Util } from 'discord.js';
+import PolyBaseCommand from '../classes/PolyCommand';
 
-export class ResourceCommand extends SlashCommand {
+export class ResourceCommand extends PolyBaseCommand {
     constructor(creator: SlashCreator) {
         super(creator, {
             name: 'resource',

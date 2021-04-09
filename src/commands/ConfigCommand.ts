@@ -3,8 +3,9 @@ import { MessageOptions } from 'slash-create/lib/context';
 import DB from '../utils/database';
 import { sendMessage } from '../utils/helper';
 import { MessageEmbed } from 'discord.js';
+import PolyBaseCommand from '../classes/PolyCommand';
 
-export class ConfigCommand extends SlashCommand {
+export class ConfigCommand extends PolyBaseCommand {
     constructor(creator: SlashCreator) {
         super(creator, {
             name: 'config',

@@ -1,8 +1,9 @@
 import { CommandContext, CommandOptionType, SlashCommand, SlashCreator } from 'slash-create';
 import { MessageOptions } from 'slash-create/lib/context';
 import DB from '../utils/database';
+import PolyBaseCommand from '../classes/PolyCommand';
 
-export class AdminCommand extends SlashCommand {
+export class AdminCommand extends PolyBaseCommand {
     constructor(creator: SlashCreator) {
         super(creator, {
             name: 'admin',

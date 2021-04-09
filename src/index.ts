@@ -60,6 +60,10 @@ client.login(process.env.BOT_TOKEN).then(async () => {
     // If the bot is in the polymart server, sync the polymart server commands
     if (client.guilds.cache.get('708395251823542312'))
         creator.syncCommandsIn('708395251823542312');
+
+    // If the bot is in the test server, sync the test server commands
+    if (client.guilds.cache.get('541709702136856613'))
+        creator.syncCommandsIn('541709702136856613');
 });
 
 export { client, verifyURL };

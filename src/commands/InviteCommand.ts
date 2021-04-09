@@ -2,8 +2,9 @@ import { CommandContext, SlashCommand, SlashCreator } from 'slash-create';
 import { MessageOptions } from 'slash-create/lib/context';
 import { MessageEmbed } from 'discord.js';
 import { client } from '../index';
+import PolyBaseCommand from '../classes/PolyCommand';
 
-export class InviteCommand extends SlashCommand {
+export class InviteCommand extends PolyBaseCommand {
     constructor(creator: SlashCreator) {
         super(creator, {
             name: 'invite',

@@ -6,8 +6,9 @@ import DB from '../utils/database';
 import { verifyURL } from '../index';
 import consola from 'consola';
 import groupBy from 'lodash/groupBy';
+import PolyBaseCommand from '../classes/PolyCommand';
 
-export class VerifyCommand extends SlashCommand {
+export class VerifyCommand extends PolyBaseCommand {
     constructor(creator: SlashCreator) {
         super(creator, {
             name: 'verify',

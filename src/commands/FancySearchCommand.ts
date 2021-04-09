@@ -5,8 +5,9 @@ import PolymartAPI from '../utils/polymartAPI';
 import { MessageOptions } from 'slash-create/lib/context';
 import { hexToDec } from 'hex2dec';
 import * as util from 'util';
+import PolyBaseCommand from '../classes/PolyCommand';
 
-export class FancySearchCommand extends SlashCommand {
+export class FancySearchCommand extends PolyBaseCommand {
     constructor(creator: SlashCreator) {
         super(creator, {
             name: 'search',

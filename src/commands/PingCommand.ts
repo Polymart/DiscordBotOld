@@ -1,8 +1,9 @@
 import { CommandContext, SlashCommand, SlashCreator } from 'slash-create';
 import { client } from '../index';
 import { MessageOptions } from 'slash-create/lib/context';
+import PolyBaseCommand from '../classes/PolyCommand';
 
-export class PingCommand extends SlashCommand {
+export class PingCommand extends PolyBaseCommand {
     constructor(creator: SlashCreator) {
         super(creator, {
             name: 'ping',
