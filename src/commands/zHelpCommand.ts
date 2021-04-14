@@ -9,7 +9,6 @@ export class HelpCommand extends PolyBaseCommand {
         super(creator, {
             name: 'help',
             description: 'Shows the help menu',
-            guildIDs: '541709702136856613',
             helpText: 'Shows the help menu',
             options: [
                 {
