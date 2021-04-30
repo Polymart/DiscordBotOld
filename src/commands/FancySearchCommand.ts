@@ -69,7 +69,7 @@ export class FancySearchCommand extends PolyBaseCommand {
 
         })
 
-        return
+        return { content: `Search results for: ${search}`, ephemeral: true }
 
     }
 

@@ -2,7 +2,7 @@ import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create'
 import { MessageOptions } from 'slash-create/lib/context'
 import { MessageEmbed } from 'discord.js'
 import PolyBaseCommand from '../classes/PolyCommand'
-import helpTopics, { HelpTopic } from '../help/HelpTopics'
+import { HelpTopic, Topics } from '../classes/Topics'
 
 export class HelpCommand extends PolyBaseCommand {
     constructor(creator: SlashCreator) {
@@ -19,7 +19,7 @@ export class HelpCommand extends PolyBaseCommand {
                     choices: creator.commands.map((v: PolyBaseCommand) => ({
                         name: v.commandName,
                         value: v.commandName,
-                    })).concat(helpTopics.map((v: HelpTopic) => ({
+                    })).concat(Topics.items().map((v: HelpTopic) => ({
                         name: v.topicName,
                         value: v.topicName,
                     }))),
@@ -35,16 +35,15 @@ export class HelpCommand extends PolyBaseCommand {
                 embeds: [
                     new MessageEmbed().addField('Commands:', this.creator.commands.map((v: PolyBaseCommand) => {
                         return `**${v.commandName}** - ${v.description}`
-                    })).addField('Topics:', helpTopics.map((v: HelpTopic) => {
+                    })).addField('Topics:', Topics.items().map((v: HelpTopic) => {
                         return `**${v.topicName}** - ${v.description}`
                     })).setAuthor('Polymart Help Commands', this.client.user.displayAvatarURL()),
                 ],
-                includeSource: true,
             }
         }
 
         const search: string = <string>ctx.options.topic
-        let topic: PolyBaseCommand | HelpTopic = helpTopics.find(v => v.topicName === search)
+        let topic: PolyBaseCommand | HelpTopic = Topics.items().find(v => v.topicName === search)
         let isCommand = false
         if (typeof topic === 'undefined') {
             topic = <PolyBaseCommand> this.creator.commands.find(v => v.commandName === search)
@@ -70,8 +69,7 @@ export class HelpCommand extends PolyBaseCommand {
 
 
         return {
-            embeds: [embed],
-            includeSource: true
+            embeds: [embed]
         }
 
     }

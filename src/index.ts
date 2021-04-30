@@ -17,7 +17,6 @@ const client: Client = new Client({
 
 const creator = new SlashCreator({
     applicationID: process.env.APPLICATION_ID,
-    publicKey: process.env.CLIENT_PUBLIC_KEY,
     token: process.env.BOT_TOKEN,
 })
 
@@ -59,5 +58,8 @@ client.login(process.env.BOT_TOKEN).then(async () => {
     if (client.guilds.cache.get('541709702136856613'))
         creator.syncCommandsIn('541709702136856613')
 })
+
+process.on('unhandledRejection', (error: Error, promise: Promise<any>) => consola.error(error))
+process.on('uncaughtException', (error: Error, origin: string) => consola.error('Uncaught Exception:', error, origin))
 
 export { client, verifyURL }

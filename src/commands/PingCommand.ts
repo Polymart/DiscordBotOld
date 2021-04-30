@@ -13,6 +13,6 @@ export class PingCommand extends PolyBaseCommand {
     }
 
     async run(ctx: CommandContext): Promise<MessageOptions> {
-        return { content: `Pong! Latency: \`${client.ws.ping}ms\`!`, ephemeral: true, includeSource: true }
+        return { content: `Pong! Latency: \`${client.ws.ping}ms\`!`, ephemeral: true }
     }
 }
