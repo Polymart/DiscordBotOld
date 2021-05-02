@@ -5,6 +5,7 @@ import fs from 'fs'
 import * as path from 'path'
 import { GatewayServer, SlashCreator } from 'slash-create'
 import PolymartAPI from './classes/PolymartAPI'
+import { logError } from './utils/helper'
 
 dotenv.config({
     path: '../.env',
@@ -55,11 +56,11 @@ client.login(process.env.BOT_TOKEN).then(async () => {
         creator.syncCommandsIn('708395251823542312')
 
     // If the bot is in the test server, sync the test server commands
-    if (client.guilds.cache.get('541709702136856613'))
-        creator.syncCommandsIn('541709702136856613')
+    if (client.guilds.cache.get('838506324332380231'))
+        creator.syncCommandsIn('838506324332380231')
 })
 
-process.on('unhandledRejection', (error: Error, promise: Promise<any>) => consola.error(error))
-process.on('uncaughtException', (error: Error, origin: string) => consola.error('Uncaught Exception:', error, origin))
+process.on('unhandledRejection', (error: Error, promise: Promise<any>) => logError(error))
+process.on('uncaughtException', (error: Error, origin: string) => logError(error))
 
 export { client, verifyURL }

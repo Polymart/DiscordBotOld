@@ -29,7 +29,7 @@ export class VerifyCommand extends PolyBaseCommand {
     async run(ctx: CommandContext): Promise<MessageOptions> {
         const manager = await Database.getInstance().getManager()
         const config = await manager.findOne(Config, ctx.guildID)
-        if (!config || !config.verifiedRole) {
+        if (!config) {
             return {
                 content: 'Bot has not been configured correctly.',
                 ephemeral: true,
@@ -55,6 +55,7 @@ export class VerifyCommand extends PolyBaseCommand {
             if (!userID) return { content: 'Verification Failed', ephemeral: true }
 
             // Check userID hasn't been used before!!
+            // TODO: remove old verification and roles from discord user and assign this user as the new user
             if (await manager.findOne(User, { polymartUserId: userID })) {
                 return {
                     content: 'Verification Failed - Account already linked',
@@ -74,7 +75,7 @@ export class VerifyCommand extends PolyBaseCommand {
         if (!userData) return { content: 'An error occured fetching user data!', ephemeral: true }
 
         for (const resource of userData.resources) {
-            if (resource.purchaseValid) {
+            if (resource.purchaseValid && resource.purchaseStatus !== 'Free') {
                 validResources++
 
                 const resourceConfig = resources.find(r => r.Id === resource.id)

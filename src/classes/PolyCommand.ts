@@ -14,6 +14,7 @@ export default class PolyBaseCommand extends Command {
     readonly log: (...args: any[]) => void
 
     constructor(creator: SlashCreator, opts: PolySlashCommandOptions) {
+        if (process.env.debug) opts.guildIDs = '838506324332380231'
         super(creator, opts)
 
         this.helpText = opts.helpText ?? 'No help text available'
