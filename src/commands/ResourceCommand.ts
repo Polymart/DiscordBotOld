@@ -1,5 +1,4 @@
-import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create'
-import { MessageOptions } from 'slash-create/lib/context'
+import { CommandContext, CommandOptionType, MessageOptions, SlashCreator } from 'slash-create'
 import PolymartAPI from '../classes/PolymartAPI'
 import { Util } from 'discord.js'
 import PolyBaseCommand from '../classes/PolyCommand'
@@ -99,7 +98,6 @@ export class ResourceCommand extends PolyBaseCommand {
                             footer: {
                                 text: response.owner.name,
                                 icon_url: `https://s3.amazonaws.com/polymart.${response.owner.type}.profilepictures/large/${response.owner.id}`,
-                                iconURL: `https://s3.amazonaws.com/polymart.${response.owner.type}.profilepictures/large/${response.owner.id}`,
                             },
                         }
                     ]

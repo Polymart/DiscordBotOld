@@ -2,7 +2,6 @@ import fs from 'fs'
 import path from 'path'
 
 export interface HelpTopic {
-    category: string;
     hint: string;
     topicName: string;
     helpText: string;
@@ -13,7 +12,7 @@ export interface HelpTopic {
 export class Topics {
 
     static items(): HelpTopic[] {
-        const topics = []
+        const topics: HelpTopic[] = []
 
         const docs = fs.readdirSync(path.join('docs'))
 

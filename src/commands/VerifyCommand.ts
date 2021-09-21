@@ -1,5 +1,4 @@
-import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create'
-import { MessageOptions } from 'slash-create/lib/context'
+import { CommandContext, CommandOptionType, MessageOptions, SlashCreator } from 'slash-create'
 import PolymartAPI from '../classes/PolymartAPI'
 import { getMember } from '../utils/helper'
 import { verifyURL } from '../index'
@@ -33,7 +32,7 @@ export class VerifyCommand extends PolyBaseCommand {
             return {
                 content: 'Bot has not been configured correctly.',
                 ephemeral: true,
-            } 
+            }
         }
         let user = await manager.findOne(User, ctx.member.id)
 

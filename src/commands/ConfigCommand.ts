@@ -1,5 +1,4 @@
-import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create'
-import { MessageOptions } from 'slash-create/lib/context'
+import { CommandContext, CommandOptionType, MessageOptions, SlashCreator } from 'slash-create'
 import PolyBaseCommand from '../classes/PolyCommand'
 import Database from '../classes/Database'
 import { Config } from '../models/Config'

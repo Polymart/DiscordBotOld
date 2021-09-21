@@ -1,5 +1,4 @@
-import { CommandContext, SlashCreator } from 'slash-create'
-import { MessageOptions } from 'slash-create/lib/context'
+import { CommandContext, MessageOptions, SlashCreator } from 'slash-create'
 import { MessageEmbed } from 'discord.js'
 import { client } from '../index'
 import PolyBaseCommand from '../classes/PolyCommand'

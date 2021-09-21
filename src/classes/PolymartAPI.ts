@@ -7,8 +7,10 @@ export default class PolymartAPI {
     private static BASE_URL = 'https://api.polymart.org'
     static NONCE = cryptoRandomString({ length: 10 })
 
-    public static async generateUserVerifyURL(): Promise<string> {
-        const response = await axios.get<GenerateUserVerifyURL>(this.BASE_URL + '/v1/generateUserVerifyURL', {
+    static axios = axios.create({ baseURL: this.BASE_URL })
+
+    public static async generateUserVerifyURL(): Promise<string|null> {
+        const response = await this.axios.get<GenerateUserVerifyURL>('/v1/generateUserVerifyURL', {
             params: {
                 service: 'PolymartDiscordBot',
                 nonce: this.NONCE,
@@ -22,8 +24,8 @@ export default class PolymartAPI {
         return null
     }
 
-    public static async verifyUser(token: string): Promise<string> {
-        const response = await axios.get<VerifyUser>(this.BASE_URL + '/v1/verifyUser', {
+    public static async verifyUser(token: string): Promise<string|null> {
+        const response = await this.axios.get<VerifyUser>('/v1/verifyUser', {
             params: {
                 service: 'PolymartDiscordBot',
                 nonce: this.NONCE,
@@ -39,8 +41,8 @@ export default class PolymartAPI {
         return null
     }
 
-    public static async getResourceUserData(resource_id: string | number, user_id: number, api_key: string): Promise<ResourceUserData> {
-        const response = await axios.post<getResourceUserData>(this.BASE_URL + '/v1/getResourceUserData', {
+    public static async getResourceUserData(resource_id: string | number, user_id: number, api_key: string): Promise<ResourceUserData|null> {
+        const response = await this.axios.post<getResourceUserData>('/v1/getResourceUserData', {
             api_key,
             resource_id,
             user_id,
@@ -54,8 +56,8 @@ export default class PolymartAPI {
         return null
     }
 
-    public static async getUserData(user_id: string, api_key: string): Promise<getUserDataResponse> {
-        const response = await axios.post<getUserData>(this.BASE_URL + '/v1/getUserData', {
+    public static async getUserData(user_id: string, api_key: string): Promise<getUserDataResponse|null> {
+        const response = await this.axios.post<getUserData>('/v1/getUserData', {
             api_key,
             user_id,
         })
@@ -68,8 +70,8 @@ export default class PolymartAPI {
         return null
     }
 
-    public static async getResourceInfo(resource_id: number, api_key: string): Promise<ResourceInfo> {
-        const response = await axios.post<getResourceInfo>(this.BASE_URL + '/v1/getResourceInfo', {
+    public static async getResourceInfo(resource_id: number, api_key: string): Promise<ResourceInfo|null> {
+        const response = await this.axios.post<getResourceInfo>(this.BASE_URL + '/v1/getResourceInfo', {
             api_key,
             resource_id,
         })
@@ -82,8 +84,8 @@ export default class PolymartAPI {
         return null
     }
 
-    public static async search(params: SearchParams): Promise<SearchResponse> {
-        const response = await axios.get<Search>(this.BASE_URL + '/v1/search', {
+    public static async search(params: SearchParams): Promise<SearchResponse|null> {
+        const response = await this.axios.get<Search>('/v1/search', {
             params: {
                 query: params.query,
                 sort: params.sort,
