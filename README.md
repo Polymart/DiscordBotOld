@@ -1,6 +1,6 @@
 # This is the old Polymart Discord Bot
 
-For information about the current version of Polymart's Discord bot, visit **https://polymart.org/blog/6/adding-the-polymart-bot-to-your-discord-server**
+For information about the current version of Polymart's Discord bot, visit **https://polymart.org/blog/6/adding-the-polymart-bot-to-your-discord-server**. The bot invite link is still the same!
 
 ***
 
