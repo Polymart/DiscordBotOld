@@ -1,4 +1,8 @@
-# [Invite the Polymart Discord Bot to your server](https://discord.com/api/oauth2/authorize?client_id=724460914560073838&permissions=268527680&scope=bot%20applications.commands)
+# This is the old Polymart Discord Bot
+
+For information about the current version of Polymart's Discord bot, visit **https://polymart.org/blog/6/adding-the-polymart-bot-to-your-discord-server**
+
+***
 
 [Polymart](https://polymart.org)'s official Discord Bot! Add it to your server [here](https://discord.com/api/oauth2/authorize?client_id=724460914560073838&permissions=268527680&scope=bot%20applications.commands).
 
